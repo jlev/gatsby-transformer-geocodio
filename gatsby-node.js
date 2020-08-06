@@ -1,4 +1,4 @@
-const opencage = require('opencage-api-client');
+const Geocodio = require('geocodio-library-node');
 
 const forward = 1;
 const reverse = 2;
@@ -50,7 +50,10 @@ async function onCreateNode({
 
   const { createNode, createNodeField, createParentChildLink } = actions
 
+  const geocoder = new Geocodio(pluginOptions.api_key);
+
   let query = false;
+  let data = {}
   if (geocodeType == forward) {
     let addressElements = [];
     for (let i = 0; i < nodeGeocodeConfig.addressFields.length; i++) {
@@ -58,87 +61,50 @@ async function onCreateNode({
         addressElements.push(node[nodeGeocodeConfig.addressFields[i]]);
       }
     }
-    query = addressElements.join(",");
+    query = addressElements.join(", ");
     console.log("Geocoding: " + query);
+    data = await geocoder.geocode(query);
   }
   else if (geocodeType == reverse) {
     query = node[nodeGeocodeConfig.positionFields.lat] + "," + node[nodeGeocodeConfig.positionFields.lon]
     console.log("Reverse Geocoding: " + query);
+    data = await geocoder.reverse(query);
   }
   try {
+    if (data.results.length > 0) {
+      var place = data.results[0];
 
-    let apiRequestOptions = {key: pluginOptions.api_key, q: query};
+      if (geocodeType == forward) {
+        createNodeField({
+          node,
+          name: `geocoderLocation`,
+          value: place.location
+        });
+      }
+      else if (geocodeType == reverse) {
+        createNodeField({
+          node,
+          name: `geocoderAddress`,
+          value: place.formatted_address
+        });
+        createNodeField({
+          node,
+          name: `geocoderAddressFields`,
+          value: place.address_components
+        });
+      }
 
-    if (nodeGeocodeConfig.addFullResult) {
-      apiRequestOptions.no_annotations = 1;
-    }
-
-    let data = await opencage.geocode(apiRequestOptions);
-
-    if (data.status.code == 200) {
-      if (data.results.length > 0) {
-        var place = data.results[0];
-
-        if (geocodeType == forward) {
-          createNodeField({
-            node,
-            name: `geocoderGeometry`,
-            value: place.geometry
-          });
-        }
-        else if (geocodeType == reverse) {
-          createNodeField({
-            node,
-            name: `geocoderAddress`,
-            value: place.formatted
-          });
-          createNodeField({
-            node,
-            name: `geocoderAddressFields`,
-            value: place.components
-          });
-        }
-
-        if (nodeGeocodeConfig.addFullResult) {
-          createNodeField({
-            node,
-            name: `geocoderFullResult`,
-            value: place
-          });
-        }
-
+      if (nodeGeocodeConfig.addFullResult) {
+        createNodeField({
+          node,
+          name: `geocoderFullResult`,
+          value: place
+        });
       }
     }
-      /*
-    else if (data.status.code == 402) {
-      console.error('You have hit the OpenCage free-trial daily limit');
-      console.error('become a customer: https://opencagedata.com/pricing'); 
-      process.exit(1);
-    }
-    else if (data.status.code == 403) {
-      console.error('You have reached your quota limit');
-      console.error('More info: https://opencagedata.com'); 
-      process.exit(1);
-    }
-    */
-    else {
-      console.error('error', data.status.message);
-    }
-  } 
+  }
   catch(error) {
-    if (error.response.status == 402) {
-      console.error('You have hit the OpenCage free-trial daily limit');
-      console.error('become a customer: https://opencagedata.com/pricing'); 
-      process.exit(1);
-    }
-    else if (error.response.status == 403) {
-      console.error('You have reached your quota limit');
-      console.error('More info: https://opencagedata.com'); 
-      process.exit(1);
-    }
-    else {
-      console.error('error', error.message);
-    }
+    console.error('error', error.message);
   }
 }
 

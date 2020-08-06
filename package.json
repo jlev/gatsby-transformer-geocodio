@@ -1,5 +1,5 @@
 {
-  "name": "gatsby-transformer-opencage-geocoder",
+  "name": "gatsby-transformer-geocodio",
   "version": "1.0.0",
   "description": "A transformer plugin for GatsbyJS to forward- and reverse-geocode content nodes",
   "main": "index.js",
@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "opencage",
+    "geocodio",
     "geocoder",
     "geospatial",
     "geo",
@@ -16,13 +16,13 @@
     "gatsby-plugin",
     "gatsby"
   ],
-  "author": "Andrew Larcombe <andrew@andrewl.net> (http://www.andrewl.net)",
-	"repository": {
-		"type": "git",
-		"url": "git://github.com/andrewl/gatsby-transformer-opencage-geocoder.git"
-	},
-	"license": "MIT",
-	"dependencies": {
-    "opencage-api-client": "^0.4.0"
-	}
+  "author": "Josh Levinger <josh@spacedog.xyz> (https://www.spacedog.xyz)",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/jlev/gatsby-transformer-geocodio.git"
+    },
+    "license": "MIT",
+    "dependencies": {
+      "geocodio-library-node": "^1.3.0"
+    }
 }
