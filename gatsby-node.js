@@ -1,7 +1,7 @@
 const Geocodio = require('geocodio-library-node');
 
-const forward = 1;
-const reverse = 2;
+const forward = "geocode";
+const reverse = "reverse";
 
 async function onCreateNode({
   node,
@@ -63,14 +63,13 @@ async function onCreateNode({
     }
     query = addressElements.join(", ");
     console.log("Geocoding: " + query);
-    data = await geocoder.geocode(query);
   }
   else if (geocodeType == reverse) {
     query = node[nodeGeocodeConfig.positionFields.lat] + "," + node[nodeGeocodeConfig.positionFields.lon]
     console.log("Reverse Geocoding: " + query);
-    data = await geocoder.reverse(query);
   }
   try {
+    data = await geocoder.handleRequest(geocodeType, query, nodeGeocodeConfig.additionalFields = [], nodeGeocodeConfig.limit = null);
     if (data.results.length > 0) {
       var place = data.results[0];
 
