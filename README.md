@@ -25,7 +25,7 @@ In your gatsby-config.js add:
     {
       resolve: `gatsby-transformer-geocodio`,
       options: {
-// Your OpenCage API key      
+// Your Geocodio API key      
         api_key: `<YOUR GEOCODIO API KEY>`,
         
 // An array of configurations per node type to geocode        
@@ -33,7 +33,7 @@ In your gatsby-config.js add:
 // Forward Geocoding
           { nodeType: `NodeTypeToBeGeocoded`,
             addressFields: [
-              'Address1', 'Address2', 'Address3', 'Town', 'Country', 'Postcode'],
+              'Address1', 'Address2', 'Address3', 'City', 'State', 'Postcode'],
             addFullResult: false,
           },
           
@@ -53,9 +53,13 @@ In your gatsby-config.js add:
 
 ## Options
 
-api_key: Your OpenCage API Key. Get one at https://geocod.io/
+api_key: Your Geocodio API Key. Get one at https://geocod.io/
 
 nodeTypes: An array of geocoding configurations, one for each node type that you want to geocode (or reverse geocode). Each element in the array is an object which needs to contain the following elements, depending on whether you want to forward- or reverse-geocode.
+
+additionalFields: A list of additional fields to request from Geocodio. List of options at https://www.geocod.io/docs/#fields
+
+limit: The maximum number of results to return. The default is no limit.
 
 ### Forward geocoding an node type 
 
@@ -63,7 +67,7 @@ nodeType: the name of the node type to forward geocode
 
 addressFields: an array of fields that contain the node's address. The address to be geocoded will be determined by concatenating all the fields in this array, in order. Some tips on how to format addresses can be found at https://www.geocod.io/docs/#address-formats-2
 
-addFullResult: if set to true, this will request and add the 'address_components' section of the geocoder result, as a field 'geocoderAddressFields' which contains extended information (see https://www.geocod.io/docs/#address-components)
+addFullResult: if set to true, this will save the full result as a field 'geocoderFullResult'
 
 Forward geocoding will add a new field 'geocoderLocation' which contains a lat and lon pair. eg
 
@@ -87,17 +91,17 @@ nodeType: the name of the node type to forward geocode
 
 locationFields: an object containing two elements - 'lat' - the name of the field containing the latitude of the node, and 'lon' - the name of the field containing the longitude of the node
 
-addFullResult: if set to true, this will request and add the 'address_components' section of the geocoder result, as a field 'geocoderFullResult' which contains extended information (see https://www.geocod.io/docs/#address-components)
+addFullResult: if set to true, this will save the full result as a field 'geocoderFullResult'
 
 Reverse geocoding will add a two new fields:
 'geocoderAddress' - a string containing the formatted address of the location specified by the lat-lon pair, and
-'geocoderAddressFields' - which contains an object containing the components of the address of the location specified by the lat-lon pair (NB please dont rely on any specific field being in the components that are returned, as they may not be.
+'geocoderAddressFields' - which contains an object containing the components of the address of the location specified by the lat-lon pair
 
 ```
 "node": {
             "id": "65879725-c151-5abf-8524-0dcdad0bb614",
             "fields": {
-              "geocoderAddress": "163 Rue Jeanne d'Arc, 54000 Nancy, France",
+              "geocoderAddress": "1109 N Highland St, Arlington, VA",
               "geocoderAddressFields": {
                 "number": "1109",
                 "predirectional": "N",
